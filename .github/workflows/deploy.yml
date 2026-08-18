@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   deploy:
@@ -37,18 +37,20 @@ jobs:
         with:
           node-version: 24
 
-      - name: Install dependencies
+      - id: install
+        name: Install dependencies
         run: npm install
 
-      - name: Validate Cloudflare credentials
+      - id: cf
+        name: Validate Cloudflare credentials
         run: |
           test -n "$CLOUDFLARE_API_TOKEN" || { echo "Missing CLOUDFLARE_API_TOKEN"; exit 10; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "Missing CLOUDFLARE_ACCOUNT_ID"; exit 11; }
           npx wrangler d1 list --json > /tmp/d1-list.json
           node -e "JSON.parse(require('fs').readFileSync('/tmp/d1-list.json','utf8')); console.log('Cloudflare credentials OK')"
 
-      - name: Resolve or create production D1
-        id: d1
+      - id: d1
+        name: Resolve or create production D1
         run: |
           DB_ID=$(node - <<'NODE'
           const fs = require('fs');
@@ -72,10 +74,11 @@ jobs:
           fi
 
           test -n "$DB_ID" || { echo "Unable to resolve opk-db database_id"; exit 20; }
-          echo "Resolved opk-db database_id=$DB_ID"
+          echo "Resolved opk-db"
           echo "db_id=$DB_ID" >> "$GITHUB_OUTPUT"
 
-      - name: Build production Wrangler config
+      - id: config
+        name: Build production Wrangler config
         env:
           DB_ID: ${{ steps.d1.outputs.db_id }}
         run: |
@@ -86,10 +89,12 @@ jobs:
           fs.writeFileSync('wrangler.deploy.jsonc', JSON.stringify(cfg, null, 2) + '\n');
           NODE
 
-      - name: Apply D1 migrations
+      - id: migrate
+        name: Apply D1 migrations
         run: npx wrangler d1 migrations apply DB --remote --config wrangler.deploy.jsonc
 
-      - name: Validate application secrets
+      - id: appsecrets
+        name: Validate application secrets
         run: |
           missing=0
           for name in DASHBOARD_PASSWORD SESSION_SECRET API_KEY; do
@@ -98,12 +103,10 @@ jobs:
               missing=1
             fi
           done
-          if [ "$missing" -ne 0 ]; then
-            echo "Cloudflare/D1 setup succeeded, but deployment is intentionally stopped until the application secrets above are added."
-            exit 30
-          fi
+          test "$missing" -eq 0
 
-      - name: Prepare Worker secrets file
+      - id: prepare
+        name: Prepare Worker secrets file
         run: |
           node - <<'NODE'
           const fs = require('fs');
@@ -115,12 +118,56 @@ jobs:
           NODE
           chmod 600 .deploy-secrets.json
 
-      - name: Deploy Worker and Custom Domain
+      - id: deploy
+        name: Deploy Worker and Custom Domain
         run: npx wrangler deploy --config wrangler.deploy.jsonc --secrets-file .deploy-secrets.json
 
-      - name: Remove temporary secrets file
+      - id: cleanup
+        name: Remove temporary secrets file
         if: always()
         run: rm -f .deploy-secrets.json wrangler.deploy.jsonc
 
-      - name: Verify health endpoint
+      - id: health
+        name: Verify health endpoint
         run: curl --fail --silent --show-error --retry 5 --retry-delay 3 https://mes.fhkq.best/api/health
+
+      - name: Publish non-secret deployment status
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          INSTALL_STATUS: ${{ steps.install.outcome }}
+          CF_STATUS: ${{ steps.cf.outcome }}
+          D1_STATUS: ${{ steps.d1.outcome }}
+          CONFIG_STATUS: ${{ steps.config.outcome }}
+          MIGRATE_STATUS: ${{ steps.migrate.outcome }}
+          APPSECRETS_STATUS: ${{ steps.appsecrets.outcome }}
+          PREPARE_STATUS: ${{ steps.prepare.outcome }}
+          DEPLOY_STATUS: ${{ steps.deploy.outcome }}
+          HEALTH_STATUS: ${{ steps.health.outcome }}
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const status = {
+            recorded_at: new Date().toISOString(),
+            run_id: process.env.GITHUB_RUN_ID,
+            source_sha: process.env.GITHUB_SHA,
+            job: process.env.JOB_STATUS || 'unknown',
+            steps: {
+              install: process.env.INSTALL_STATUS || 'not_run',
+              cloudflare_credentials: process.env.CF_STATUS || 'not_run',
+              d1: process.env.D1_STATUS || 'not_run',
+              config: process.env.CONFIG_STATUS || 'not_run',
+              migration: process.env.MIGRATE_STATUS || 'not_run',
+              application_secrets: process.env.APPSECRETS_STATUS || 'not_run',
+              prepare_secrets: process.env.PREPARE_STATUS || 'not_run',
+              deploy: process.env.DEPLOY_STATUS || 'not_run',
+              health: process.env.HEALTH_STATUS || 'not_run'
+            }
+          };
+          fs.writeFileSync('.deploy-status.json', JSON.stringify(status, null, 2) + '\n');
+          NODE
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .deploy-status.json
+          git diff --cached --quiet || git commit -m "Record deployment status"
+          git push
