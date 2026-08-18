@@ -1,3 +1,4 @@
+# Production deployment workflow. Secrets are supplied by GitHub Actions.
 name: deploy
 
 on:
