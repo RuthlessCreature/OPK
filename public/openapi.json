@@ -1,0 +1,58 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OPK API",
+    "version": "0.1.0",
+    "description": "One Person Kanban REST API. Third-party apps and LLMs should authenticate with a Bearer API Key."
+  },
+  "servers": [{"url": "https://mes.fhkq.best"}],
+  "security": [{"bearerAuth": []}],
+  "components": {
+    "securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "API Key"}},
+    "schemas": {
+      "ProjectFields": {"type": "object", "properties": {"name": {"type": "string", "maxLength": 200}, "description": {"type": "string", "maxLength": 5000}, "status": {"type": "string", "enum": ["active", "paused", "done", "archived"]}, "priority": {"type": "string", "enum": ["low", "medium", "high", "urgent"]}, "start_date": {"type": ["string", "null"], "format": "date"}, "due_date": {"type": ["string", "null"], "format": "date"}, "next_action": {"type": "string", "maxLength": 2000}, "notes": {"type": "string", "maxLength": 10000}}},
+      "ProjectCreate": {"allOf": [{"$ref": "#/components/schemas/ProjectFields"}, {"type": "object", "required": ["name"]}]},
+      "MilestoneFields": {"type": "object", "properties": {"title": {"type": "string", "maxLength": 300}, "status": {"type": "string", "enum": ["planned", "in_progress", "blocked", "done", "skipped"]}, "due_date": {"type": ["string", "null"], "format": "date"}, "sort_order": {"type": "integer"}, "notes": {"type": "string", "maxLength": 10000}}},
+      "MilestoneCreate": {"allOf": [{"$ref": "#/components/schemas/MilestoneFields"}, {"type": "object", "required": ["title"]}]},
+      "IssueFields": {"type": "object", "properties": {"title": {"type": "string", "maxLength": 300}, "milestone_id": {"type": ["string", "null"]}, "description": {"type": "string", "maxLength": 5000}, "status": {"type": "string", "enum": ["open", "in_progress", "waiting", "resolved", "closed"]}, "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]}, "next_action": {"type": "string", "maxLength": 2000}, "notes": {"type": "string", "maxLength": 10000}}},
+      "IssueCreate": {"allOf": [{"$ref": "#/components/schemas/IssueFields"}, {"type": "object", "required": ["title"]}]}
+    }
+  },
+  "paths": {
+    "/api/health": {"get": {"security": [], "summary": "Health check", "responses": {"200": {"description": "OK"}}}},
+    "/api/v1/dashboard": {"get": {"summary": "Get dashboard summary", "responses": {"200": {"description": "Dashboard"}}}},
+    "/api/v1/projects": {
+      "get": {"summary": "List projects", "parameters": [{"name": "status", "in": "query", "schema": {"type": "string"}}, {"name": "q", "in": "query", "schema": {"type": "string"}}], "responses": {"200": {"description": "Projects"}}},
+      "post": {"summary": "Create project", "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ProjectCreate"}}}}, "responses": {"201": {"description": "Created"}}}
+    },
+    "/api/v1/projects/{id}": {
+      "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+      "get": {"summary": "Get project with milestones and issues", "responses": {"200": {"description": "Project"}}},
+      "patch": {"summary": "Update project", "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ProjectFields"}}}}, "responses": {"200": {"description": "Updated"}}},
+      "delete": {"summary": "Delete project", "responses": {"200": {"description": "Deleted"}}}
+    },
+    "/api/v1/projects/{id}/milestones": {
+      "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+      "get": {"summary": "List milestones for project", "responses": {"200": {"description": "Milestones"}}},
+      "post": {"summary": "Create milestone", "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MilestoneCreate"}}}}, "responses": {"201": {"description": "Created"}}}
+    },
+    "/api/v1/milestones": {"get": {"summary": "List milestones", "parameters": [{"name": "project_id", "in": "query", "schema": {"type": "string"}}, {"name": "status", "in": "query", "schema": {"type": "string"}}], "responses": {"200": {"description": "Milestones"}}}},
+    "/api/v1/milestones/{id}": {
+      "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+      "patch": {"summary": "Update milestone", "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MilestoneFields"}}}}, "responses": {"200": {"description": "Updated"}}},
+      "delete": {"summary": "Delete milestone", "responses": {"200": {"description": "Deleted"}}}
+    },
+    "/api/v1/projects/{id}/issues": {
+      "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+      "get": {"summary": "List issues for project", "responses": {"200": {"description": "Issues"}}},
+      "post": {"summary": "Create issue", "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/IssueCreate"}}}}, "responses": {"201": {"description": "Created"}}}
+    },
+    "/api/v1/issues": {"get": {"summary": "List issues", "parameters": [{"name": "project_id", "in": "query", "schema": {"type": "string"}}, {"name": "status", "in": "query", "schema": {"type": "string"}}, {"name": "severity", "in": "query", "schema": {"type": "string"}}], "responses": {"200": {"description": "Issues"}}}},
+    "/api/v1/issues/{id}": {
+      "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+      "patch": {"summary": "Update issue", "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/IssueFields"}}}}, "responses": {"200": {"description": "Updated"}}},
+      "delete": {"summary": "Delete issue", "responses": {"200": {"description": "Deleted"}}}
+    },
+    "/api/v1/export": {"get": {"summary": "Export all data as JSON", "responses": {"200": {"description": "Backup"}}}}
+  }
+}
