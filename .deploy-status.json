@@ -1,0 +1,17 @@
+{
+  "recorded_at": "2026-08-18T15:34:31.285Z",
+  "run_id": "32155258649",
+  "source_sha": "b483957c6b3cb5d22ca4dae6deadaa33634dae6e",
+  "job": "failure",
+  "steps": {
+    "install": "success",
+    "cloudflare_credentials": "failure",
+    "d1": "skipped",
+    "config": "skipped",
+    "migration": "skipped",
+    "application_secrets": "skipped",
+    "prepare_secrets": "skipped",
+    "deploy": "skipped",
+    "health": "skipped"
+  }
+}
