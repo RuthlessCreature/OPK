@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OPK · One Person Kanban</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div id="loginView" class="login-shell hidden">
+    <form id="loginForm" class="login-card">
+      <div class="brand-mark">OPK</div>
+      <h1>一人公司看板</h1>
+      <p>输入访问密码进入。</p>
+      <input id="passwordInput" type="password" autocomplete="current-password" placeholder="Password" required />
+      <button class="btn primary wide" type="submit">进入看板</button>
+      <div id="loginError" class="form-error"></div>
+    </form>
+  </div>
+
+  <div id="appView" class="app hidden">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark small">OPK</span><span>One Person Kanban</span></div>
+      <div class="top-actions">
+        <button id="refreshBtn" class="btn ghost">刷新</button>
+        <button id="newProjectBtn" class="btn primary">+ 新建项目</button>
+        <button id="logoutBtn" class="btn ghost">退出</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="side-head"><strong>项目</strong><span id="projectCount" class="muted"></span></div>
+        <input id="projectSearch" class="search" placeholder="搜索项目…" />
+        <div id="projectList" class="project-list"></div>
+      </aside>
+      <main class="main">
+        <section id="dashboardView"></section>
+        <section id="projectView" class="hidden"></section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="projectDialog" class="dialog">
+    <form id="projectForm" method="dialog" class="form-grid">
+      <input type="hidden" name="id" />
+      <h2 id="projectDialogTitle">新建项目</h2>
+      <label>项目名称<input name="name" maxlength="200" required /></label>
+      <div class="two-col">
+        <label>状态<select name="status"><option value="active">进行中</option><option value="paused">暂停</option><option value="done">完成</option><option value="archived">归档</option></select></label>
+        <label>优先级<select name="priority"><option value="low">低</option><option value="medium" selected>中</option><option value="high">高</option><option value="urgent">紧急</option></select></label>
+      </div>
+      <div class="two-col"><label>开始日期<input name="start_date" type="date" /></label><label>截止日期<input name="due_date" type="date" /></label></div>
+      <label>下一步动作<textarea name="next_action" rows="2"></textarea></label>
+      <label>项目说明<textarea name="description" rows="3"></textarea></label>
+      <label>备注<textarea name="notes" rows="4"></textarea></label>
+      <div class="dialog-actions"><button type="button" class="btn ghost" data-close>取消</button><button type="submit" class="btn primary">保存</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="milestoneDialog" class="dialog">
+    <form id="milestoneForm" method="dialog" class="form-grid">
+      <input type="hidden" name="id" /><input type="hidden" name="project_id" />
+      <h2 id="milestoneDialogTitle">新建计划节点</h2>
+      <label>节点名称<input name="title" maxlength="300" required /></label>
+      <div class="two-col"><label>状态<select name="status"><option value="planned">计划</option><option value="in_progress">进行中</option><option value="blocked">阻塞</option><option value="done">完成</option><option value="skipped">跳过</option></select></label><label>截止日期<input name="due_date" type="date" /></label></div>
+      <label>备注<textarea name="notes" rows="4"></textarea></label>
+      <div class="dialog-actions"><button type="button" class="btn ghost" data-close>取消</button><button type="submit" class="btn primary">保存</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="issueDialog" class="dialog">
+    <form id="issueForm" method="dialog" class="form-grid">
+      <input type="hidden" name="id" /><input type="hidden" name="project_id" />
+      <h2 id="issueDialogTitle">新建问题</h2>
+      <label>问题标题<input name="title" maxlength="300" required /></label>
+      <div class="two-col"><label>状态<select name="status"><option value="open">待处理</option><option value="in_progress">处理中</option><option value="waiting">等待</option><option value="resolved">已解决</option><option value="closed">关闭</option></select></label><label>严重度<select name="severity"><option value="low">低</option><option value="medium">中</option><option value="high">高</option><option value="critical">严重</option></select></label></div>
+      <label>关联节点<select name="milestone_id"><option value="">不关联节点</option></select></label>
+      <label>下一步动作<textarea name="next_action" rows="2"></textarea></label>
+      <label>问题说明<textarea name="description" rows="3"></textarea></label>
+      <label>备注<textarea name="notes" rows="4"></textarea></label>
+      <div class="dialog-actions"><button type="button" class="btn ghost" data-close>取消</button><button type="submit" class="btn primary">保存</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast hidden"></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
