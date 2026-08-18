@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install
+      - name: JavaScript syntax
+        run: |
+          node --check src/index.js
+          node --check public/app.js
+      - name: OpenAPI JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('public/openapi.json','utf8'))"
+      - name: SQLite migration
+        run: |
+          python - <<'PY'
+          import sqlite3, pathlib
+          sql = pathlib.Path('migrations/0001_init.sql').read_text()
+          con = sqlite3.connect(':memory:')
+          con.executescript(sql)
+          tables = {r[0] for r in con.execute("select name from sqlite_master where type='table'")}
+          assert {'projects','milestones','issues'} <= tables
+          print('migration ok')
+          PY
+      - name: Wrangler dry run
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const source = fs.readFileSync('wrangler.jsonc','utf8');
+          fs.writeFileSync('wrangler.ci.jsonc', source.replace('REPLACE_WITH_D1_DATABASE_ID','00000000-0000-0000-0000-000000000000'));
+          NODE
+          npx wrangler deploy --dry-run --config wrangler.ci.jsonc
