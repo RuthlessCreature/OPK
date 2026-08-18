@@ -1,0 +1,125 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "migrations/**"
+      - "wrangler.jsonc"
+      - "package.json"
+      - ".github/workflows/deploy.yml"
+
+concurrency:
+  group: opk-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+      API_KEY: ${{ secrets.API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate Cloudflare credentials
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "Missing CLOUDFLARE_API_TOKEN"; exit 10; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "Missing CLOUDFLARE_ACCOUNT_ID"; exit 11; }
+          npx wrangler d1 list --json > /tmp/d1-list.json
+          node -e "JSON.parse(require('fs').readFileSync('/tmp/d1-list.json','utf8')); console.log('Cloudflare credentials OK')"
+
+      - name: Resolve or create production D1
+        id: d1
+        run: |
+          DB_ID=$(node - <<'NODE'
+          const fs = require('fs');
+          const rows = JSON.parse(fs.readFileSync('/tmp/d1-list.json','utf8'));
+          const db = rows.find(x => x.name === 'opk-db');
+          process.stdout.write(db ? (db.uuid || db.id || '') : '');
+          NODE
+          )
+
+          if [ -z "$DB_ID" ]; then
+            echo "opk-db not found; creating it in APAC..."
+            npx wrangler d1 create opk-db --location=apac
+            npx wrangler d1 list --json > /tmp/d1-list.json
+            DB_ID=$(node - <<'NODE'
+          const fs = require('fs');
+          const rows = JSON.parse(fs.readFileSync('/tmp/d1-list.json','utf8'));
+          const db = rows.find(x => x.name === 'opk-db');
+          process.stdout.write(db ? (db.uuid || db.id || '') : '');
+          NODE
+            )
+          fi
+
+          test -n "$DB_ID" || { echo "Unable to resolve opk-db database_id"; exit 20; }
+          echo "Resolved opk-db database_id=$DB_ID"
+          echo "db_id=$DB_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Build production Wrangler config
+        env:
+          DB_ID: ${{ steps.d1.outputs.db_id }}
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const cfg = JSON.parse(fs.readFileSync('wrangler.jsonc','utf8'));
+          cfg.d1_databases[0].database_id = process.env.DB_ID;
+          fs.writeFileSync('wrangler.deploy.jsonc', JSON.stringify(cfg, null, 2) + '\n');
+          NODE
+
+      - name: Apply D1 migrations
+        run: npx wrangler d1 migrations apply DB --remote --config wrangler.deploy.jsonc
+
+      - name: Validate application secrets
+        run: |
+          missing=0
+          for name in DASHBOARD_PASSWORD SESSION_SECRET API_KEY; do
+            if [ -z "${!name}" ]; then
+              echo "Missing GitHub Actions secret: $name"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "Cloudflare/D1 setup succeeded, but deployment is intentionally stopped until the application secrets above are added."
+            exit 30
+          fi
+
+      - name: Prepare Worker secrets file
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          fs.writeFileSync('.deploy-secrets.json', JSON.stringify({
+            DASHBOARD_PASSWORD: process.env.DASHBOARD_PASSWORD,
+            SESSION_SECRET: process.env.SESSION_SECRET,
+            API_KEY: process.env.API_KEY
+          }));
+          NODE
+          chmod 600 .deploy-secrets.json
+
+      - name: Deploy Worker and Custom Domain
+        run: npx wrangler deploy --config wrangler.deploy.jsonc --secrets-file .deploy-secrets.json
+
+      - name: Remove temporary secrets file
+        if: always()
+        run: rm -f .deploy-secrets.json wrangler.deploy.jsonc
+
+      - name: Verify health endpoint
+        run: curl --fail --silent --show-error --retry 5 --retry-delay 3 https://mes.fhkq.best/api/health
