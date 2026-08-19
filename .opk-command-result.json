@@ -1,0 +1,41 @@
+{
+  "executed_at": "2026-08-19T01:18:06.088Z",
+  "request_id": "bootstrap-2026-08-19",
+  "method": "GET",
+  "path": "/api/v1/dashboard",
+  "http_status": 200,
+  "ok": true,
+  "response": {
+    "ok": true,
+    "data": {
+      "today": "2026-08-19",
+      "project_counts": {
+        "active": 1
+      },
+      "milestone_counts": {
+        "done": 5,
+        "in_progress": 1
+      },
+      "issue_counts": {},
+      "active_projects": [
+        {
+          "id": "39a6bb50-2d0b-4cd1-8dca-db9510efcf45",
+          "name": "OPK 一人公司项目进度看板",
+          "description": "一人公司项目进度管理看板。Cloudflare Workers + D1 + Vanilla Web 前端，支持项目、里程碑、问题、状态、备注及第三方/LLM REST API。",
+          "status": "active",
+          "priority": "high",
+          "start_date": "2026-08-18",
+          "due_date": null,
+          "next_action": "把现有项目和待办逐步同步进 OPK；后续对话中明确提出项目 CRUD/状态操作时，通过 OPK API 实际执行并返回真实结果。",
+          "notes": "2026-08-19 状态同步：v0.1 已合并 main；GitHub CI 已通过；Cloudflare 凭证验证、D1 opk-db、migration、Worker 部署、自定义域名 mes.fhkq.best、/api/health 均已成功。生产 Secret 由 GitHub Environment 管理。",
+          "created_at": "2026-08-19T01:17:01.481Z",
+          "updated_at": "2026-08-19T01:17:12.024Z",
+          "open_milestones": 1,
+          "open_issues": 0
+        }
+      ],
+      "overdue_milestones": [],
+      "priority_issues": []
+    }
+  }
+}
