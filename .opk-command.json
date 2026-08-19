@@ -1,5 +1,10 @@
 {
-  "request_id": "metaalpha-sync-2026-08-19-verify",
-  "method": "GET",
-  "path": "/api/v1/projects/03716d1e-e21f-460d-a19a-56faf51fc23c"
+  "request_id": "metaalpha-close-issues-2026-08-19-1",
+  "method": "PATCH",
+  "path": "/api/v1/issues/b5a4cb0b-aa8f-4ccc-bee8-6e0d97ce7fb9",
+  "body": {
+    "status": "closed",
+    "next_action": "不再作为开放问题跟踪；8/17 realized 是否写入继续由 META_FWD_001 前瞻里程碑和 append-only ledger 状态自然反映。",
+    "notes": "2026-08-19 关闭：根因已从 provider latency/定时触发不可靠收敛为运维问题，并已新增显式 audited settlement trigger（settlement_only，不改 predictor/gate）。截至关闭时 8/17 realized 尚未出现在 ledger，因此此关闭仅表示运维问题已处理，不表示伪造或提前确认结算结果。"
+  }
 }
