@@ -121,10 +121,26 @@ jobs:
         name: Deploy Worker and Custom Domain
         run: npx wrangler deploy --config wrangler.deploy.jsonc --secrets-file .deploy-secrets.json
 
+      - id: removekey
+        name: Remove legacy API_KEY Worker secret
+        run: |
+          printf '{"API_KEY":null}\n' > .remove-legacy-secret.json
+          npx wrangler secret bulk .remove-legacy-secret.json --config wrangler.deploy.jsonc
+          npx wrangler secret list --config wrangler.deploy.jsonc --format json > /tmp/worker-secrets.json
+          node - <<'NODE'
+          const fs = require('fs');
+          const rows = JSON.parse(fs.readFileSync('/tmp/worker-secrets.json', 'utf8'));
+          if (rows.some(x => x.name === 'API_KEY')) {
+            console.error('API_KEY still exists after deletion');
+            process.exit(1);
+          }
+          console.log('Legacy API_KEY Worker secret removed');
+          NODE
+
       - id: cleanup
-        name: Remove temporary secrets file
+        name: Remove temporary secrets files
         if: always()
-        run: rm -f .deploy-secrets.json wrangler.deploy.jsonc
+        run: rm -f .deploy-secrets.json .remove-legacy-secret.json wrangler.deploy.jsonc
 
       - id: health
         name: Verify health endpoint
@@ -150,6 +166,7 @@ jobs:
           APPSECRETS_STATUS: ${{ steps.appsecrets.outcome }}
           PREPARE_STATUS: ${{ steps.prepare.outcome }}
           DEPLOY_STATUS: ${{ steps.deploy.outcome }}
+          REMOVE_KEY_STATUS: ${{ steps.removekey.outcome }}
           HEALTH_STATUS: ${{ steps.health.outcome }}
           PUBLIC_API_STATUS: ${{ steps.publicapi.outcome }}
         run: |
@@ -169,6 +186,7 @@ jobs:
               browser_login_secrets: process.env.APPSECRETS_STATUS || 'not_run',
               prepare_secrets: process.env.PREPARE_STATUS || 'not_run',
               deploy: process.env.DEPLOY_STATUS || 'not_run',
+              remove_legacy_api_key: process.env.REMOVE_KEY_STATUS || 'not_run',
               health: process.env.HEALTH_STATUS || 'not_run',
               public_api: process.env.PUBLIC_API_STATUS || 'not_run'
             }
