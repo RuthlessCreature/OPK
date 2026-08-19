@@ -1,27 +1,38 @@
 {
-  "batch_id": "metaalpha-forward-settlement-fixed-2026-08-19",
+  "batch_id": "opk-skill-zero-auth-v0.2-2026-08-20",
   "commands": [
     {
-      "request_id": "update-forward-after-catchup",
+      "request_id": "remove-migration-duplicate",
+      "method": "DELETE",
+      "path": "/api/v1/projects/5bf8037c-3a5e-4b31-9aa6-f853955c5b76"
+    },
+    {
+      "request_id": "update-opk-skill-v02",
       "method": "PATCH",
-      "path": "/api/v1/milestones/139e8513-b104-43d4-88d3-e6f38baf81aa",
+      "path": "/api/v1/projects/fa9d64d3-8078-45b6-9262-a1beeae0c356",
       "body": {
-        "status": "in_progress",
-        "notes": "Primary confirmatory继续冻结。结算链路问题已彻底修复：新增 settlement-safe audit，严格 prediction audit 保持不变；结算时仅容忍结构审计已独立确认 confirmatory_eligible=false 的晚到事故样本，eligible 样本仍要求Git提交早于09:25且单次touch。2026-08-19 10:10 catch-up已PASS并写入immutable ledger。官方状态：eligible_records=2（8/17、8/19），settled_sessions=1，sessions_until_gate=499，market_coverage=1.0。8/17官方锁定：previous_close=3927.176，close=3982.654，realized_return=+1.412669%，direction=up。8/18也锁outcome用于审计/描述，但因09:47晚到永久confirmatory_eligible=false，不进入500样本。8/19 06:10:41预测有效，待收盘后结算。"
+        "description": "跨 Agent 的 OPK 项目同步 Skill。OPK /api/v1 为零鉴权直接 REST；Agent 首次接入先查同名/相似项目，由用户决定新提交或覆盖；无候选时自动生成 project-id、创建项目、保存映射。工作前 READ，工作后 WRITE + VERIFY。GitHub: RuthlessCreature/OPK-Skill。",
+        "status": "active",
+        "priority": "high",
+        "next_action": "在 Codex、Claude、OpenCode 等不同 Agent 中分别加载 v0.2，验证：零鉴权读取、相似项目提示、新建 project-id、用户选择覆盖/新建、工作完成后自动回写与 read-back。",
+        "notes": "2026-08-20 v0.2：OPK API 已取消客户端 API_KEY；新增 POST /api/v1/project-ids 与 GET /api/v1/projects/similar；POST /api/v1/projects 支持传入 project_id/id。OPK-Skill 已同步更新 SKILL.md、AGENTS.md、README、API.md 和零依赖 Python CLI。首次提交遇到同名/相似项目必须停止并由用户决定新提交或覆盖；覆盖仅 PATCH 项目本体并保留里程碑/问题。生产 deploy 的 public_api 验证已通过。"
       }
     },
     {
-      "request_id": "update-project-live-next-action",
-      "method": "PATCH",
-      "path": "/api/v1/projects/03716d1e-e21f-460d-a19a-56faf51fc23c",
+      "request_id": "add-v02-milestone",
+      "method": "POST",
+      "path": "/api/v1/projects/fa9d64d3-8078-45b6-9262-a1beeae0c356/milestones",
       "body": {
-        "next_action": "保持 META_FWD_001 predictor/gate 冻结，按06:00预测、18:30结算、次日07:15补结算持续收集；当前1/500 eligible settled，剩499。新研究仅按 META_V2_SPECIFICITY_PROTOCOL_001 开新 family，不重开 v1 调参。"
+        "title": "v0.2 零鉴权 API + 首次接入查重",
+        "status": "done",
+        "sort_order": 15,
+        "notes": "已完成：客户端无需 API_KEY；API 可生成 project-id；相似项目 API；Skill 首次接入需要用户在新提交/覆盖之间明确决策；API 参考直接内置于 Skill。"
       }
     },
     {
-      "request_id": "verify-no-open-issues",
+      "request_id": "verify-opk-skill-v02",
       "method": "GET",
-      "path": "/api/v1/projects/03716d1e-e21f-460d-a19a-56faf51fc23c"
+      "path": "/api/v1/projects/fa9d64d3-8078-45b6-9262-a1beeae0c356"
     }
   ]
 }
