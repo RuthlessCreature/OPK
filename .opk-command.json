@@ -1,0 +1,5 @@
+{
+  "request_id": "bootstrap-2026-08-19",
+  "method": "GET",
+  "path": "/api/v1/dashboard"
+}
