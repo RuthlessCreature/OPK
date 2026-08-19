@@ -14,9 +14,6 @@ permissions:
 jobs:
   call:
     runs-on: ubuntu-latest
-    environment: CLOUDFLARE_API_TOKEN
-    env:
-      API_KEY: ${{ secrets.API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,7 +22,6 @@ jobs:
 
       - name: Execute OPK API command
         run: |
-          test -n "$API_KEY" || { echo "Missing API_KEY"; exit 10; }
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
           const BASE = 'https://mes.fhkq.best';
@@ -34,10 +30,7 @@ jobs:
           const path = String(cmd.path || '');
           if (!['GET','POST','PATCH','DELETE'].includes(method)) throw new Error('Unsupported method');
           if (!/^\/api\/v1\//.test(path) && path !== '/api/health') throw new Error('Path outside OPK API');
-          const headers = {
-            'authorization': `Bearer ${process.env.API_KEY}`,
-            'content-type': 'application/json'
-          };
+          const headers = { 'content-type': 'application/json' };
           const options = { method, headers };
           if (cmd.body !== undefined && method !== 'GET' && method !== 'DELETE') options.body = JSON.stringify(cmd.body);
           const res = await fetch(BASE + path, options);
