@@ -1,5 +1,5 @@
 {
-  "request_id": "bootstrap-2026-08-19-2",
+  "request_id": "metaalpha-sync-2026-08-19-query",
   "method": "GET",
-  "path": "/api/v1/dashboard"
+  "path": "/api/v1/projects?q=MetaAlpha"
 }
