@@ -1,6 +1,6 @@
 {
-  "executed_at": "2026-08-19T01:51:45.207Z",
-  "request_id": "metaalpha-sync-2026-08-19-ms2",
+  "executed_at": "2026-08-19T01:52:18.778Z",
+  "request_id": "metaalpha-sync-2026-08-19-ms3",
   "method": "POST",
   "path": "/api/v1/projects/03716d1e-e21f-460d-a19a-56faf51fc23c/milestones",
   "http_status": 201,
@@ -8,15 +8,15 @@
   "response": {
     "ok": true,
     "data": {
-      "id": "99ca95a0-cf7b-4e0a-b718-072d2f893da6",
+      "id": "139e8513-b104-43d4-88d3-e6f38baf81aa",
       "project_id": "03716d1e-e21f-460d-a19a-56faf51fc23c",
-      "title": "完成 2025-01-01 起精确逐日 expanding 重建",
+      "title": "META_FWD_001 前瞻收集首个500个 eligible settled sessions",
       "status": "in_progress",
       "due_date": null,
-      "sort_order": 20,
-      "notes": "固定C=0.01的关键三模型快线已完成：Baseline LL 0.691576；Ziping 0.690857（ΔLL +0.000719、ΔBrier +0.000365，低于冻结门槛）；Hash 0.688998（ΔLL +0.002578）。仍需完成每天重新 inner-CV 选C的精确六模型重建并归档结果。",
-      "created_at": "2026-08-19T01:51:45.005Z",
-      "updated_at": "2026-08-19T01:51:45.005Z"
+      "sort_order": 30,
+      "notes": "Primary confirmatory。候选 family、predictor source、runtime、gate 全部冻结。2026-08-17 为首个 eligible 预测但尚未锁 realized；2026-08-18 预测晚于09:25，永久不计入500样本。目标是按不可变ledger继续收集首个500个 eligible settled sessions，再执行一次性 gate。",
+      "created_at": "2026-08-19T01:52:18.565Z",
+      "updated_at": "2026-08-19T01:52:18.565Z"
     }
   }
 }
