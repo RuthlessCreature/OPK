@@ -1,15 +1,12 @@
 {
-  "request_id": "metaalpha-sync-2026-08-19-create-project",
+  "request_id": "metaalpha-sync-2026-08-19-ms1",
   "method": "POST",
-  "path": "/api/v1/projects",
+  "path": "/api/v1/projects/03716d1e-e21f-460d-a19a-56faf51fc23c/milestones",
   "body": {
-    "name": "MetaAlpha 传统时空映射统计检验",
-    "description": "以A股为主要市场，检验干支/子平/奇门/梅花等传统时空映射是否具有超越普通市场因子、普通日历因子和同复杂度随机/错位时间编码的独特统计信息，并以不可变前瞻样本验证。当前研究框架已从“寻找最准的玄学模型”转向 specificity-first：先证明真实传统映射的精确时间对齐比 matched-null 更特殊，再讨论传统解释；交易效用与传统解释分开评价。",
-    "status": "active",
-    "priority": "high",
-    "start_date": "2026-08-16",
+    "title": "完成 v2 specificity-first 框架转向与历史 falsification",
+    "status": "done",
     "due_date": null,
-    "next_action": "完成2025-01-01起精确逐日 expanding 重建；继续 META_FWD_001 冻结前瞻实验并收集首个500个 eligible settled sessions；不再新增神煞/纳音/流派等历史特征自由度。",
-    "notes": "2026-08-19 状态同步：\n1) 框架转向：MetaAlpha v1“哪套玄学最准”的范式基本结束，v2 改为 specificity-first。传统分支必须先赢普通市场/日历基线，再在 matched-null（shift/hash/scramble/fake-anchor）中达到高分位，并通过时间稳定性、跨市场复制和 future-only 才允许做传统解释。\n2) 历史证据：MEIHUA_TIME_V1 明确失败；Qimen V1 弱且不稳定；Cycle 更像泛时间编码；Ziping 仅保留为弱 regime-dependent 残差候选，尚无传统日期对齐特异性证据。\n3) 248-shift null：Cycle 真映射约88.7%分位、28个错位版本更强；Ziping约87.1%分位、32个错位版本更强；Qimen约65.7%；Meihua为0%，248个错位版本全部更强。\n4) 100-seed Hash负对照：约26%的随机Hash历史上能打败Baseline；冻结的 LIUYAO_HASH_V1 约95%分位，属于偏幸运随机编码；seed 4 的历史ΔLogLoss约+0.004981，明显强于传统候选，说明多重尝试可制造伪Alpha。\n5) 富Gregorian日历压力测试：普通日历解释掉部分历史结构；Ziping 相对原始市场Baseline仅剩约+0.000517 LogLoss残差，Cycle/Qimen加富日历后绝对表现不再优于原始Baseline。\n6) 2025-01-01起逐日 expanding 固定C=0.01关键三模型：Baseline LL=0.691576；Ziping LL=0.690857，ΔLL=+0.000719、ΔBrier=+0.000365，低于前瞻冻结效应量门槛；Hash LL=0.688998，ΔLL=+0.002578。Ziping 2025为负贡献（ΔLL=-0.000575），2026转正（+0.002815），显示强 regime dependence。\n7) META_FWD_001 仍为 primary confirmatory，候选 family 和 predictor/gate 不改。2026-08-17 是首个 eligible 预测，但Sina结算时仅返回到8/14，realized尚未锁定；2026-08-18 预测09:47生成，晚于09:25 anchor，confirmatory_eligible=false，永久不计入500样本。\n8) 运维修复：forward 调度已改为06:00预测、18:30结算、次日07:15补结算，以降低GitHub Actions/Sina延迟导致的漏样本。8/18漏样本只保留为incident，不允许补写或改成eligible。\n9) 当前纪律：不以结果差为由继续增加神煞、纳音、旺衰、卦辞评分或新流派；新预测 formulation 必须新 hypothesis/family ID 并在看结果前冻结。"
+    "sort_order": 10,
+    "notes": "已完成 rich Gregorian calendar stress、248 dense shifted-state null、100-seed hash negative-control ensemble、regime/router diagnostics，并形成 v2 specificity-first 决策：传统解释必须先证明真实映射比同复杂度 null 更特殊。"
   }
 }
