@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "opk",
-  "main": "src/index.js",
+  "main": "src/public-api.js",
   "compatibility_date": "2026-08-18",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
