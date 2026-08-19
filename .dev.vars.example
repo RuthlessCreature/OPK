@@ -1,3 +1,2 @@
 DASHBOARD_PASSWORD=<your-password>
 SESSION_SECRET=<long-random-secret>
-API_KEY=<long-random-api-key>
