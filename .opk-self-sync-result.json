@@ -1,0 +1,53 @@
+{
+  "synced_at": "2026-08-19T01:17:05.051Z",
+  "api": "https://mes.fhkq.best",
+  "project": {
+    "id": "39a6bb50-2d0b-4cd1-8dca-db9510efcf45",
+    "name": "OPK 一人公司项目进度看板",
+    "status": "active",
+    "priority": "high",
+    "start_date": "2026-08-18",
+    "due_date": null,
+    "next_action": "把现有项目和待办逐步同步进 OPK；后续对话中明确提出项目 CRUD/状态操作时，通过 OPK API 实际执行并返回真实结果。",
+    "notes": "2026-08-19 状态同步：v0.1 已合并 main；GitHub CI 已通过；Cloudflare 凭证验证、D1 opk-db、migration、Worker 部署、自定义域名 mes.fhkq.best、/api/health 均已成功。生产 Secret 由 GitHub Environment 管理。"
+  },
+  "milestones": [
+    {
+      "id": "baef5cbc-6bb8-4081-84b3-554da9d5ec98",
+      "title": "需求与架构定义",
+      "status": "done",
+      "sort_order": 10
+    },
+    {
+      "id": "4f4f2a97-3628-4f17-a065-9ace9b3554ad",
+      "title": "v0.1 前后端开发",
+      "status": "done",
+      "sort_order": 20
+    },
+    {
+      "id": "1f7ff72d-33ca-4c4e-baea-2584268ab89d",
+      "title": "GitHub CI 与 main 发布",
+      "status": "done",
+      "sort_order": 30
+    },
+    {
+      "id": "db294f78-069e-44c9-82b6-2bbc58c28fff",
+      "title": "Cloudflare D1 / Worker / 域名上线",
+      "status": "done",
+      "sort_order": 40
+    },
+    {
+      "id": "cd667563-68cc-4f37-af2c-6f57ae1064a2",
+      "title": "对话驱动 OPK API 操作链路",
+      "status": "done",
+      "sort_order": 50
+    },
+    {
+      "id": "e5c1f55d-d036-4346-88dd-ceb622c6cfd8",
+      "title": "同步现有项目与待办",
+      "status": "in_progress",
+      "sort_order": 60
+    }
+  ],
+  "open_issues": []
+}
