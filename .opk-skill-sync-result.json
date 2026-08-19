@@ -1,0 +1,26 @@
+{
+  "synced_at": "2026-08-19T02:06:16.220Z",
+  "project": {
+    "id": "fa9d64d3-8078-45b6-9262-a1beeae0c356",
+    "name": "OPK Skill",
+    "status": "active",
+    "priority": "high",
+    "next_action": "在 Codex/Claude/其他 Agent 中分别加载并做一次真实项目读写验证；根据兼容性反馈继续完善安装入口。",
+    "notes": "2026-08-19：已创建 public repo RuthlessCreature/OPK-Skill；已提供 SKILL.md、AGENTS.md、零依赖 Python CLI、.opk.json 映射模板、install.sh 和 CI 校验。Skill 强制执行 READ → WORK → WRITE → VERIFY 闭环。"
+  },
+  "milestones": [
+    {
+      "id": "d30e36fc-df07-4c7e-a018-05063d54f574",
+      "title": "OPK Skill v1 仓库与核心闭环",
+      "status": "done",
+      "sort_order": 10
+    },
+    {
+      "id": "de2d66d1-3140-4c63-84ab-87a893f64052",
+      "title": "跨 Agent 实机接入验证",
+      "status": "in_progress",
+      "sort_order": 20
+    }
+  ],
+  "open_issues": []
+}
