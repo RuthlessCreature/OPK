@@ -1,5 +1,5 @@
 {
-  "request_id": "opk-skill-discovery-2026-08-19-1",
+  "request_id": "metaalpha-close-verify-2026-08-19",
   "method": "GET",
-  "path": "/api/v1/projects?q=OPK%20Skill"
+  "path": "/api/v1/projects/03716d1e-e21f-460d-a19a-56faf51fc23c"
 }
