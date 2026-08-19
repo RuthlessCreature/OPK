@@ -1,0 +1,134 @@
+name: sync-opk-skill-project
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/sync-opk-skill-project.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    environment: CLOUDFLARE_API_TOKEN
+    env:
+      API_KEY: ${{ secrets.API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Sync OPK Skill project through production API
+        run: |
+          test -n "$API_KEY" || { echo "Missing API_KEY"; exit 10; }
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+
+          const BASE = 'https://mes.fhkq.best';
+          const headers = {
+            authorization: `Bearer ${process.env.API_KEY}`,
+            'content-type': 'application/json'
+          };
+
+          async function api(path, method='GET', body) {
+            const res = await fetch(BASE + path, {
+              method,
+              headers,
+              body: body === undefined ? undefined : JSON.stringify(body)
+            });
+            const text = await res.text();
+            let parsed;
+            try { parsed = text ? JSON.parse(text) : null; }
+            catch { parsed = { raw: text }; }
+            if (!res.ok) {
+              console.error(method, path, res.status, JSON.stringify(parsed));
+              process.exit(20);
+            }
+            return parsed;
+          }
+
+          const name = 'OPK Skill';
+          const patch = {
+            name,
+            description: '跨 Agent 的 OPK 项目同步 Skill。Agent 在开始工作前读取 OPK 项目/里程碑/问题/下一步，完成工作后自动回写并 read-back 验证。GitHub: RuthlessCreature/OPK-Skill。',
+            status: 'active',
+            priority: 'high',
+            start_date: '2026-08-19',
+            next_action: '在 Codex/Claude/其他 Agent 中分别加载并做一次真实项目读写验证；根据兼容性反馈继续完善安装入口。',
+            notes: '2026-08-19：已创建 public repo RuthlessCreature/OPK-Skill；已提供 SKILL.md、AGENTS.md、零依赖 Python CLI、.opk.json 映射模板、install.sh 和 CI 校验。Skill 强制执行 READ → WORK → WRITE → VERIFY 闭环。'
+          };
+
+          const search = await api('/api/v1/projects?q=' + encodeURIComponent(name));
+          const rows = Array.isArray(search.data) ? search.data : [];
+          let project = rows.find(x => String(x.name || '').toLowerCase() === name.toLowerCase());
+          if (project) {
+            project = (await api(`/api/v1/projects/${encodeURIComponent(project.id)}`, 'PATCH', patch)).data;
+          } else {
+            project = (await api('/api/v1/projects', 'POST', patch)).data;
+          }
+
+          const wanted = [
+            {
+              title: 'OPK Skill v1 仓库与核心闭环',
+              status: 'done',
+              sort_order: 10,
+              notes: '已完成 SKILL.md、AGENTS.md、纯 Python REST CLI、install.sh、项目映射模板与 CI；读→做→写→回读验证规则已固化。'
+            },
+            {
+              title: '跨 Agent 实机接入验证',
+              status: 'in_progress',
+              sort_order: 20,
+              notes: '下一阶段在 Codex、Claude 或其他可加载 Skill 的 Agent 中分别做一次真实读取与回写验证。'
+            }
+          ];
+
+          const ms = await api(`/api/v1/projects/${encodeURIComponent(project.id)}/milestones`);
+          const existing = Array.isArray(ms.data) ? ms.data : [];
+          for (const item of wanted) {
+            const hit = existing.find(x => x.title === item.title);
+            if (hit) {
+              await api(`/api/v1/milestones/${encodeURIComponent(hit.id)}`, 'PATCH', item);
+            } else {
+              await api(`/api/v1/projects/${encodeURIComponent(project.id)}/milestones`, 'POST', item);
+            }
+          }
+
+          const detail = (await api(`/api/v1/projects/${encodeURIComponent(project.id)}`)).data;
+          const out = {
+            synced_at: new Date().toISOString(),
+            project: {
+              id: detail.id,
+              name: detail.name,
+              status: detail.status,
+              priority: detail.priority,
+              next_action: detail.next_action,
+              notes: detail.notes
+            },
+            milestones: (detail.milestones || []).map(x => ({
+              id: x.id,
+              title: x.title,
+              status: x.status,
+              sort_order: x.sort_order
+            })),
+            open_issues: (detail.issues || []).filter(x => !['resolved','closed'].includes(x.status)).map(x => ({
+              id: x.id,
+              title: x.title,
+              status: x.status,
+              severity: x.severity
+            }))
+          };
+          fs.writeFileSync('.opk-skill-sync-result.json', JSON.stringify(out, null, 2) + '\n');
+          console.log(JSON.stringify(out, null, 2));
+          NODE
+
+      - name: Publish non-secret sync result
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .opk-skill-sync-result.json
+          git diff --cached --quiet || git commit -m "Record OPK Skill sync result"
+          git push
