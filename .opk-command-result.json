@@ -1,87 +1,24 @@
 {
-  "executed_at": "2026-08-19T01:53:37.356Z",
-  "request_id": "metaalpha-sync-2026-08-19-verify",
-  "method": "GET",
-  "path": "/api/v1/projects/03716d1e-e21f-460d-a19a-56faf51fc23c",
+  "executed_at": "2026-08-19T01:58:59.416Z",
+  "request_id": "metaalpha-close-issues-2026-08-19-1",
+  "method": "PATCH",
+  "path": "/api/v1/issues/b5a4cb0b-aa8f-4ccc-bee8-6e0d97ce7fb9",
   "http_status": 200,
   "ok": true,
   "response": {
     "ok": true,
     "data": {
-      "id": "03716d1e-e21f-460d-a19a-56faf51fc23c",
-      "name": "MetaAlpha 传统时空映射统计检验",
-      "description": "以A股为主要市场，检验干支/子平/奇门/梅花等传统时空映射是否具有超越普通市场因子、普通日历因子和同复杂度随机/错位时间编码的独特统计信息，并以不可变前瞻样本验证。当前研究框架已从“寻找最准的玄学模型”转向 specificity-first：先证明真实传统映射的精确时间对齐比 matched-null 更特殊，再讨论传统解释；交易效用与传统解释分开评价。",
-      "status": "active",
-      "priority": "high",
-      "start_date": "2026-08-16",
-      "due_date": null,
-      "next_action": "完成2025-01-01起精确逐日 expanding 重建；继续 META_FWD_001 冻结前瞻实验并收集首个500个 eligible settled sessions；不再新增神煞/纳音/流派等历史特征自由度。",
-      "notes": "2026-08-19 状态同步：\n1) 框架转向：MetaAlpha v1“哪套玄学最准”的范式基本结束，v2 改为 specificity-first。传统分支必须先赢普通市场/日历基线，再在 matched-null（shift/hash/scramble/fake-anchor）中达到高分位，并通过时间稳定性、跨市场复制和 future-only 才允许做传统解释。\n2) 历史证据：MEIHUA_TIME_V1 明确失败；Qimen V1 弱且不稳定；Cycle 更像泛时间编码；Ziping 仅保留为弱 regime-dependent 残差候选，尚无传统日期对齐特异性证据。\n3) 248-shift null：Cycle 真映射约88.7%分位、28个错位版本更强；Ziping约87.1%分位、32个错位版本更强；Qimen约65.7%；Meihua为0%，248个错位版本全部更强。\n4) 100-seed Hash负对照：约26%的随机Hash历史上能打败Baseline；冻结的 LIUYAO_HASH_V1 约95%分位，属于偏幸运随机编码；seed 4 的历史ΔLogLoss约+0.004981，明显强于传统候选，说明多重尝试可制造伪Alpha。\n5) 富Gregorian日历压力测试：普通日历解释掉部分历史结构；Ziping 相对原始市场Baseline仅剩约+0.000517 LogLoss残差，Cycle/Qimen加富日历后绝对表现不再优于原始Baseline。\n6) 2025-01-01起逐日 expanding 固定C=0.01关键三模型：Baseline LL=0.691576；Ziping LL=0.690857，ΔLL=+0.000719、ΔBrier=+0.000365，低于前瞻冻结效应量门槛；Hash LL=0.688998，ΔLL=+0.002578。Ziping 2025为负贡献（ΔLL=-0.000575），2026转正（+0.002815），显示强 regime dependence。\n7) META_FWD_001 仍为 primary confirmatory，候选 family 和 predictor/gate 不改。2026-08-17 是首个 eligible 预测，但Sina结算时仅返回到8/14，realized尚未锁定；2026-08-18 预测09:47生成，晚于09:25 anchor，confirmatory_eligible=false，永久不计入500样本。\n8) 运维修复：forward 调度已改为06:00预测、18:30结算、次日07:15补结算，以降低GitHub Actions/Sina延迟导致的漏样本。8/18漏样本只保留为incident，不允许补写或改成eligible。\n9) 当前纪律：不以结果差为由继续增加神煞、纳音、旺衰、卦辞评分或新流派；新预测 formulation 必须新 hypothesis/family ID 并在看结果前冻结。",
-      "created_at": "2026-08-19T01:50:47.407Z",
-      "updated_at": "2026-08-19T01:50:47.407Z",
-      "milestones": [
-        {
-          "id": "9dd2082a-d44c-4821-be4e-54e1ac186cd9",
-          "project_id": "03716d1e-e21f-460d-a19a-56faf51fc23c",
-          "title": "完成 v2 specificity-first 框架转向与历史 falsification",
-          "status": "done",
-          "due_date": null,
-          "sort_order": 10,
-          "notes": "已完成 rich Gregorian calendar stress、248 dense shifted-state null、100-seed hash negative-control ensemble、regime/router diagnostics，并形成 v2 specificity-first 决策：传统解释必须先证明真实映射比同复杂度 null 更特殊。",
-          "created_at": "2026-08-19T01:51:22.167Z",
-          "updated_at": "2026-08-19T01:51:22.167Z"
-        },
-        {
-          "id": "99ca95a0-cf7b-4e0a-b718-072d2f893da6",
-          "project_id": "03716d1e-e21f-460d-a19a-56faf51fc23c",
-          "title": "完成 2025-01-01 起精确逐日 expanding 重建",
-          "status": "in_progress",
-          "due_date": null,
-          "sort_order": 20,
-          "notes": "固定C=0.01的关键三模型快线已完成：Baseline LL 0.691576；Ziping 0.690857（ΔLL +0.000719、ΔBrier +0.000365，低于冻结门槛）；Hash 0.688998（ΔLL +0.002578）。仍需完成每天重新 inner-CV 选C的精确六模型重建并归档结果。",
-          "created_at": "2026-08-19T01:51:45.005Z",
-          "updated_at": "2026-08-19T01:51:45.005Z"
-        },
-        {
-          "id": "139e8513-b104-43d4-88d3-e6f38baf81aa",
-          "project_id": "03716d1e-e21f-460d-a19a-56faf51fc23c",
-          "title": "META_FWD_001 前瞻收集首个500个 eligible settled sessions",
-          "status": "in_progress",
-          "due_date": null,
-          "sort_order": 30,
-          "notes": "Primary confirmatory。候选 family、predictor source、runtime、gate 全部冻结。2026-08-17 为首个 eligible 预测但尚未锁 realized；2026-08-18 预测晚于09:25，永久不计入500样本。目标是按不可变ledger继续收集首个500个 eligible settled sessions，再执行一次性 gate。",
-          "created_at": "2026-08-19T01:52:18.565Z",
-          "updated_at": "2026-08-19T01:52:18.565Z"
-        }
-      ],
-      "issues": [
-        {
-          "id": "b5a4cb0b-aa8f-4ccc-bee8-6e0d97ce7fb9",
-          "project_id": "03716d1e-e21f-460d-a19a-56faf51fc23c",
-          "milestone_id": "139e8513-b104-43d4-88d3-e6f38baf81aa",
-          "title": "2026-08-17 eligible 预测尚未锁定 realized",
-          "description": "8/17 是 META_FWD_001 首个 confirmatory_eligible 预测。结算任务已执行，但当时 AKShare/Sina 仅返回到 2026-08-14，因此 append-only realized ledger 没有伪造或改用其他来源写入结果。",
-          "status": "waiting",
-          "severity": "medium",
-          "next_action": "由既有18:30结算和次日07:15 catch-up流程继续尝试从冻结供应商锁定8/17 realized；禁止手工补价或换源救援。",
-          "notes": "这是 provider latency，不是预测模型失败。当前 official status 仍为 eligible_records=1、settled_sessions=0。",
-          "created_at": "2026-08-19T01:52:50.675Z",
-          "updated_at": "2026-08-19T01:52:50.675Z"
-        },
-        {
-          "id": "8513bd89-9988-4beb-892d-c4a294bf56b8",
-          "project_id": "03716d1e-e21f-460d-a19a-56faf51fc23c",
-          "milestone_id": "139e8513-b104-43d4-88d3-e6f38baf81aa",
-          "title": "2026-08-18 前瞻预测晚于09:25导致样本永久失效",
-          "description": "8/18 META_FWD_001 于09:47:47生成，晚于冻结的09:25 session anchor，因此 precommitted_before_anchor=false、confirmatory_eligible=false。该预测只能保留为描述样本，永久不能进入500个确认样本。",
-          "status": "resolved",
-          "severity": "high",
-          "next_action": "继续验证新的06:00预测调度是否在后续交易日稳定早于09:25完成；若再发生漏样本，评估更可靠的外部调度机制，但不得修改冻结 predictor/gate。",
-          "notes": "已完成运维修复：预测由08:10提前至06:00；结算由16:40推迟至18:30；增加次日07:15 catch-up。8/18历史事故不补写、不重算、不改eligible。",
-          "created_at": "2026-08-19T01:53:14.696Z",
-          "updated_at": "2026-08-19T01:53:14.696Z"
-        }
-      ]
+      "id": "b5a4cb0b-aa8f-4ccc-bee8-6e0d97ce7fb9",
+      "project_id": "03716d1e-e21f-460d-a19a-56faf51fc23c",
+      "milestone_id": "139e8513-b104-43d4-88d3-e6f38baf81aa",
+      "title": "2026-08-17 eligible 预测尚未锁定 realized",
+      "description": "8/17 是 META_FWD_001 首个 confirmatory_eligible 预测。结算任务已执行，但当时 AKShare/Sina 仅返回到 2026-08-14，因此 append-only realized ledger 没有伪造或改用其他来源写入结果。",
+      "status": "closed",
+      "severity": "medium",
+      "next_action": "不再作为开放问题跟踪；8/17 realized 是否写入继续由 META_FWD_001 前瞻里程碑和 append-only ledger 状态自然反映。",
+      "notes": "2026-08-19 关闭：根因已从 provider latency/定时触发不可靠收敛为运维问题，并已新增显式 audited settlement trigger（settlement_only，不改 predictor/gate）。截至关闭时 8/17 realized 尚未出现在 ledger，因此此关闭仅表示运维问题已处理，不表示伪造或提前确认结算结果。",
+      "created_at": "2026-08-19T01:52:50.675Z",
+      "updated_at": "2026-08-19T01:58:58.808Z"
     }
   }
 }
