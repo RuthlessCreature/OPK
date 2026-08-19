@@ -1,7 +1,7 @@
 {
-  "recorded_at": "2026-08-18T15:46:48.210Z",
-  "run_id": "32156464027",
-  "source_sha": "5fe6b3198a96ac003378b6f7402100f1782f5bab",
+  "recorded_at": "2026-08-19T16:45:13.312Z",
+  "run_id": "32277625916",
+  "source_sha": "ee274e37e75bfc8d4faaf5850bbe117b19c3a18b",
   "job": "success",
   "steps": {
     "install": "success",
@@ -9,9 +9,10 @@
     "d1": "success",
     "config": "success",
     "migration": "success",
-    "application_secrets": "success",
+    "browser_login_secrets": "success",
     "prepare_secrets": "success",
     "deploy": "success",
-    "health": "success"
+    "health": "success",
+    "public_api": "success"
   }
 }
