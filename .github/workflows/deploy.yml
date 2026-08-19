@@ -1,4 +1,4 @@
-# Production deployment workflow. Secrets are supplied by GitHub Actions.
+# Production deployment workflow. API v1 is intentionally unauthenticated for single-user agent access.
 name: deploy
 
 on:
@@ -29,7 +29,6 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
       SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-      API_KEY: ${{ secrets.API_KEY }}
 
     steps:
       - uses: actions/checkout@v4
@@ -95,10 +94,10 @@ jobs:
         run: npx wrangler d1 migrations apply DB --remote --config wrangler.deploy.jsonc
 
       - id: appsecrets
-        name: Validate application secrets
+        name: Validate browser-login secrets
         run: |
           missing=0
-          for name in DASHBOARD_PASSWORD SESSION_SECRET API_KEY; do
+          for name in DASHBOARD_PASSWORD SESSION_SECRET; do
             if [ -z "${!name}" ]; then
               echo "Missing GitHub Actions secret: $name"
               missing=1
@@ -107,14 +106,13 @@ jobs:
           test "$missing" -eq 0
 
       - id: prepare
-        name: Prepare Worker secrets file
+        name: Prepare Worker browser-login secrets file
         run: |
           node - <<'NODE'
           const fs = require('fs');
           fs.writeFileSync('.deploy-secrets.json', JSON.stringify({
             DASHBOARD_PASSWORD: process.env.DASHBOARD_PASSWORD,
-            SESSION_SECRET: process.env.SESSION_SECRET,
-            API_KEY: process.env.API_KEY
+            SESSION_SECRET: process.env.SESSION_SECRET
           }));
           NODE
           chmod 600 .deploy-secrets.json
@@ -132,6 +130,14 @@ jobs:
         name: Verify health endpoint
         run: curl --fail --silent --show-error --retry 5 --retry-delay 3 https://mes.fhkq.best/api/health
 
+      - id: publicapi
+        name: Verify unauthenticated agent API
+        run: |
+          curl --fail --silent --show-error https://mes.fhkq.best/api/v1/projects > /tmp/projects.json
+          node -e "const x=require('/tmp/projects.json'); if(!x.ok) process.exit(1); console.log('Public projects API OK')"
+          curl --fail --silent --show-error -X POST https://mes.fhkq.best/api/v1/project-ids > /tmp/project-id.json
+          node -e "const x=require('/tmp/project-id.json'); if(!x.ok || !x.data?.project_id) process.exit(1); console.log('Public project-id API OK:', x.data.project_id)"
+
       - name: Publish non-secret deployment status
         if: always()
         env:
@@ -145,6 +151,7 @@ jobs:
           PREPARE_STATUS: ${{ steps.prepare.outcome }}
           DEPLOY_STATUS: ${{ steps.deploy.outcome }}
           HEALTH_STATUS: ${{ steps.health.outcome }}
+          PUBLIC_API_STATUS: ${{ steps.publicapi.outcome }}
         run: |
           node - <<'NODE'
           const fs = require('fs');
@@ -159,10 +166,11 @@ jobs:
               d1: process.env.D1_STATUS || 'not_run',
               config: process.env.CONFIG_STATUS || 'not_run',
               migration: process.env.MIGRATE_STATUS || 'not_run',
-              application_secrets: process.env.APPSECRETS_STATUS || 'not_run',
+              browser_login_secrets: process.env.APPSECRETS_STATUS || 'not_run',
               prepare_secrets: process.env.PREPARE_STATUS || 'not_run',
               deploy: process.env.DEPLOY_STATUS || 'not_run',
-              health: process.env.HEALTH_STATUS || 'not_run'
+              health: process.env.HEALTH_STATUS || 'not_run',
+              public_api: process.env.PUBLIC_API_STATUS || 'not_run'
             }
           };
           fs.writeFileSync('.deploy-status.json', JSON.stringify(status, null, 2) + '\n');
