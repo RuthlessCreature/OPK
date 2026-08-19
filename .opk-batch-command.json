@@ -1,46 +1,25 @@
 {
-  "batch_id": "metaalpha-advance-close-all-2026-08-19",
+  "batch_id": "metaalpha-complete-expanding-2026-08-19",
   "commands": [
     {
-      "request_id": "close-8-17-operational-issue",
-      "method": "PATCH",
-      "path": "/api/v1/issues/b5a4cb0b-aa8f-4ccc-bee8-6e0d97ce7fb9",
-      "body": {
-        "status": "closed",
-        "next_action": "不再作为开放问题跟踪；8/17 realized 是否写入由 META_FWD_001 前瞻里程碑和 append-only ledger 自然反映。",
-        "notes": "2026-08-19 关闭：根因已收敛为结算调度链可靠性问题。MetaAlpha 仓库已新增显式 audited settlement trigger，复用冻结 runtime/audit/append-only ledger，不改 predictor 或 gate。关闭仅表示运维问题已处理；若 ledger 尚未写入 8/17 realized，不代表伪造或提前确认结果。"
-      }
-    },
-    {
-      "request_id": "close-8-18-anchor-incident",
-      "method": "PATCH",
-      "path": "/api/v1/issues/8513bd89-9988-4beb-892d-c4a294bf56b8",
-      "body": {
-        "status": "closed",
-        "next_action": "无需继续作为问题跟踪；后续交易日只检查06:00预测是否持续早于09:25。",
-        "notes": "2026-08-19 关闭：8/18 09:47晚到样本永久保持 confirmatory_eligible=false；运维修复已完成，预测提前至06:00、结算18:30、次日07:15 catch-up。8/19 新调度首测于06:10:41生成，precommitted_before_anchor=true、confirmatory_eligible=true。"
-      }
-    },
-    {
-      "request_id": "update-expanding-milestone",
+      "request_id": "complete-expanding-milestone",
       "method": "PATCH",
       "path": "/api/v1/milestones/99ca95a0-cf7b-4e0a-b718-072d2f893da6",
       "body": {
-        "status": "in_progress",
-        "notes": "固定C=0.01的六模型2025-01-01起daily-expanding已完整：Baseline LL 0.691576；Ziping 0.690857（ΔLL +0.000719）；Qimen 0.691272（+0.000304）；Cycle 0.691287（+0.000289）；Meihua 0.696081（-0.004505）；Hash负对照0.688998（+0.002578）。四个传统分支均未达到冻结ΔLL>=0.001效应量门槛。v1历史阶段已正式closeout，不再救援调参。当前仅保留每天重新inner-CV选C的精确Baseline-vs-Ziping重建作为最终稳健性复核。"
+        "status": "done",
+        "notes": "已完成2025-01-01起逐日expanding重建。固定C=0.01六模型：Baseline LL 0.691576；Ziping 0.690857（ΔLL +0.000719）；Qimen 0.691272（+0.000304）；Cycle 0.691287（+0.000289）；Meihua 0.696081（-0.004505）；Hash负对照0.688998（+0.002578）。精确Baseline-vs-Ziping版本每天重新inner-CV选C，393/393天两个模型均选择C=0.01，因此精确结果与固定C完全一致：Ziping ΔLL +0.000719、ΔBrier +0.000365，均低于冻结效应量门槛。历史v1阶段正式关闭。"
       }
     },
     {
-      "request_id": "update-forward-milestone",
+      "request_id": "update-project-next-action",
       "method": "PATCH",
-      "path": "/api/v1/milestones/139e8513-b104-43d4-88d3-e6f38baf81aa",
+      "path": "/api/v1/projects/03716d1e-e21f-460d-a19a-56faf51fc23c",
       "body": {
-        "status": "in_progress",
-        "notes": "Primary confirmatory继续冻结不变。8/17为首个eligible预测；8/18晚到永久不计样本；8/19新06:00调度首测成功，06:10:41生成且confirmatory_eligible=true，训练数据已到8/18。为解决定时score不可靠，已新增显式 audited settlement trigger，仅执行既有audit+append-only ledger，不改predictor/gate。继续收集首个500个eligible settled sessions。"
+        "next_action": "继续 META_FWD_001 冻结前瞻实验，收集首个500个 eligible settled sessions；执行已注册的 v2 specificity-first 方法政策，不再重开 v1 历史调参。"
       }
     },
     {
-      "request_id": "verify-metaalpha-project",
+      "request_id": "verify-after-expanding-complete",
       "method": "GET",
       "path": "/api/v1/projects/03716d1e-e21f-460d-a19a-56faf51fc23c"
     }
