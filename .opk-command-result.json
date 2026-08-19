@@ -1,25 +1,50 @@
 {
-  "executed_at": "2026-08-19T16:48:57.784Z",
-  "request_id": "opk-skill-create-2026-08-19-1",
-  "method": "POST",
-  "path": "/api/v1/projects",
-  "http_status": 201,
+  "executed_at": "2026-08-19T16:50:27.002Z",
+  "request_id": "verify-opk-similar-2026-08-20",
+  "method": "GET",
+  "path": "/api/v1/projects/similar?q=OPK%20Skill",
+  "http_status": 200,
   "ok": true,
   "response": {
     "ok": true,
-    "project_id": "5bf8037c-3a5e-4b31-9aa6-f853955c5b76",
     "data": {
-      "id": "5bf8037c-3a5e-4b31-9aa6-f853955c5b76",
-      "name": "OPK Skill",
-      "description": "跨 Agent 的 OPK 项目同步 Skill。Agent 在开始工作前读取 OPK 项目/里程碑/问题/下一步，完成工作后自动回写并 read-back 验证。GitHub: RuthlessCreature/OPK-Skill。",
-      "status": "active",
-      "priority": "high",
-      "start_date": "2026-08-19",
-      "due_date": null,
-      "next_action": "在 Codex/Claude/其他 Agent 中分别加载并做一次真实项目读写验证；根据兼容性反馈继续完善安装入口。",
-      "notes": "2026-08-19：已创建 public repo RuthlessCreature/OPK-Skill；已提供 SKILL.md、AGENTS.md、零依赖 Python CLI、.opk.json 映射模板、install.sh 和 CI 校验。Skill 强制执行 READ → WORK → WRITE → VERIFY 闭环。",
-      "created_at": "2026-08-19T16:48:57.087Z",
-      "updated_at": "2026-08-19T16:48:57.087Z"
+      "query": "OPK Skill",
+      "threshold": 0.45,
+      "has_candidates": true,
+      "candidates": [
+        {
+          "id": "5bf8037c-3a5e-4b31-9aa6-f853955c5b76",
+          "name": "OPK Skill",
+          "description": "跨 Agent 的 OPK 项目同步 Skill。Agent 在开始工作前读取 OPK 项目/里程碑/问题/下一步，完成工作后自动回写并 read-back 验证。GitHub: RuthlessCreature/OPK-Skill。",
+          "status": "active",
+          "priority": "high",
+          "start_date": "2026-08-19",
+          "due_date": null,
+          "next_action": "在 Codex/Claude/其他 Agent 中分别加载并做一次真实项目读写验证；根据兼容性反馈继续完善安装入口。",
+          "notes": "2026-08-19：已创建 public repo RuthlessCreature/OPK-Skill；已提供 SKILL.md、AGENTS.md、零依赖 Python CLI、.opk.json 映射模板、install.sh 和 CI 校验。Skill 强制执行 READ → WORK → WRITE → VERIFY 闭环。",
+          "created_at": "2026-08-19T16:48:57.087Z",
+          "updated_at": "2026-08-19T16:48:57.087Z",
+          "milestone_count": 0,
+          "open_issue_count": 0,
+          "similarity": 1
+        },
+        {
+          "id": "fa9d64d3-8078-45b6-9262-a1beeae0c356",
+          "name": "OPK Skill",
+          "description": "跨 Agent 的 OPK 项目同步 Skill。Agent 在开始工作前读取 OPK 项目/里程碑/问题/下一步，完成工作后自动回写并 read-back 验证。GitHub: RuthlessCreature/OPK-Skill。",
+          "status": "active",
+          "priority": "high",
+          "start_date": "2026-08-19",
+          "due_date": null,
+          "next_action": "Provide OPK_API_KEY through an external secret source, then run pWebsite context/ensure-project and complete one real OPK write verification.",
+          "notes": "2026-08-20: Added runtime-only API key resolution from OPK_API_KEY, OPK_API_KEY_FILE, and user-managed Codex/OpenCode env files; the client never writes or prints the key. Added automatic project mapping: infer the repository name, cache an exact or unique OPK match into non-secret .opk.json, and ensure-project can create and verify a missing project while refusing ambiguous exact matches. Updated and hash-verified the Codex and OpenCode Skill copies; source and both installed CLIs passed context and ensure-project tests. A real API key must still be supplied externally; the key shared in chat should be rotated.",
+          "created_at": "2026-08-19T02:05:09.313Z",
+          "updated_at": "2026-08-19T16:28:31.657Z",
+          "milestone_count": 2,
+          "open_issue_count": 0,
+          "similarity": 1
+        }
+      ]
     }
   }
 }
