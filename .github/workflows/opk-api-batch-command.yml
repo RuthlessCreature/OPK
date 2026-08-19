@@ -1,0 +1,67 @@
+name: opk-api-batch-command
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.opk-batch-command.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: opk-api-batch-command
+  cancel-in-progress: false
+
+jobs:
+  call:
+    runs-on: ubuntu-latest
+    environment: CLOUDFLARE_API_TOKEN
+    env:
+      API_KEY: ${{ secrets.API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Execute OPK API batch
+        run: |
+          test -n "$API_KEY" || { echo "Missing API_KEY"; exit 10; }
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const BASE = 'https://mes.fhkq.best';
+          const batch = JSON.parse(fs.readFileSync('.opk-batch-command.json','utf8'));
+          if (!Array.isArray(batch.commands) || batch.commands.length < 1 || batch.commands.length > 50) throw new Error('commands must be array 1..50');
+          const results=[];
+          for (let i=0;i<batch.commands.length;i++) {
+            const cmd=batch.commands[i];
+            const method=String(cmd.method||'GET').toUpperCase();
+            const path=String(cmd.path||'');
+            if (!['GET','POST','PATCH','DELETE'].includes(method)) throw new Error(`Unsupported method at ${i}`);
+            if (!/^\/api\/v1\//.test(path) && path !== '/api/health') throw new Error(`Path outside OPK API at ${i}`);
+            const headers={'authorization':`Bearer ${process.env.API_KEY}`,'content-type':'application/json'};
+            const options={method,headers};
+            if (cmd.body !== undefined && method !== 'GET' && method !== 'DELETE') options.body=JSON.stringify(cmd.body);
+            const res=await fetch(BASE+path,options);
+            const text=await res.text();
+            let parsed; try { parsed=text?JSON.parse(text):null; } catch { parsed={raw:text}; }
+            results.push({index:i,request_id:cmd.request_id||null,method,path,http_status:res.status,ok:res.ok,response:parsed});
+            if (!res.ok) break;
+          }
+          const out={executed_at:new Date().toISOString(),batch_id:batch.batch_id||null,ok:results.length===batch.commands.length && results.every(x=>x.ok),results};
+          fs.writeFileSync('.opk-batch-command-result.json',JSON.stringify(out,null,2)+'\n');
+          console.log(JSON.stringify(out,null,2));
+          if (!out.ok) process.exitCode=20;
+          NODE
+      - name: Publish non-secret batch result
+        if: always()
+        run: |
+          if [ -f .opk-batch-command-result.json ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add .opk-batch-command-result.json
+            git diff --cached --quiet || git commit -m 'Record OPK API batch command result'
+            git pull --rebase origin main
+            git push
+          fi
