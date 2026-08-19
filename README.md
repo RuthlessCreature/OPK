@@ -2,17 +2,90 @@
 
 一个故意保持简单的一人公司项目进度看板。
 
-**目标只有一个：打开页面以后，马上知道有哪些项目、下一步干什么、哪些节点卡住、哪些问题没解决。**
+**目标只有一个：打开页面以后，马上知道有哪些项目、下一步干什么、哪些节点卡住、哪些问题没解决；同时让各种 Agent 可以直接读写同一份项目状态。**
 
 ## 技术结构
 
-- Cloudflare Worker：REST API、登录、Session
+- Cloudflare Worker：REST API、网页登录、Session
 - Cloudflare D1：项目 / 节点 / 问题
 - Workers Static Assets：原生 HTML / CSS / JavaScript
 - Custom Domain：`mes.fhkq.best`
-- 第三方 App / LLM：REST + Bearer API Key
+- Agent / 第三方程序：直接 REST API，**无需 API Key**
 - 机器可读接口：`/openapi.json`
 - 无 React、Vue、Next.js、数据库服务器、ChatGPT Site 或其他运行时依赖
+
+## API 与网页安全模型
+
+这是一个单人自用系统，故意采用两套入口：
+
+1. **网页 UI**：仍使用共享密码 + Session Cookie。
+2. **`/api/v1/*` Agent API**：无需 Bearer Token / API Key，可直接调用。
+
+因此任何能访问 `https://mes.fhkq.best/api/v1/*` 的程序都可以读写 OPK。这个设计是为了让不同 Agent 零配置接入。
+
+网页仍依赖两个 Worker Secret：
+
+```text
+DASHBOARD_PASSWORD
+SESSION_SECRET
+```
+
+不再需要 `API_KEY`。
+
+## 项目首次接入流程
+
+为了避免 Agent 重复创建项目，推荐流程：
+
+```text
+项目没有固定 project_id
+  ↓
+GET /api/v1/projects/similar?q=<项目名>
+  ↓
+是否有同名/相似项目？
+  ├─ 无 → POST /api/v1/project-ids → POST /api/v1/projects
+  └─ 有 → Agent 必须告诉用户候选项目
+          用户选择：新提交 / 覆盖已有项目
+```
+
+“覆盖”建议只 PATCH 已有项目本体，保留原里程碑和问题历史。
+
+## 新 project-id API
+
+```bash
+curl -X POST https://mes.fhkq.best/api/v1/project-ids
+```
+
+返回：
+
+```json
+{
+  "ok": true,
+  "data": {
+    "project_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  }
+}
+```
+
+创建项目时可以把该 ID 传回来：
+
+```bash
+curl -X POST https://mes.fhkq.best/api/v1/projects \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "project_id":"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "name":"Example Project",
+    "status":"active",
+    "priority":"medium"
+  }'
+```
+
+## 同名 / 相似项目检测
+
+```bash
+curl 'https://mes.fhkq.best/api/v1/projects/similar?q=OPK%20Skill'
+```
+
+返回候选项目和 `similarity` 分数，供 Agent 展示给用户选择。
 
 ## 功能
 
@@ -51,153 +124,74 @@
 
 ### 数据导出
 
-`GET /api/v1/export` 可一次性导出全部 JSON，方便备份或交给其他程序处理。
+```text
+GET /api/v1/export
+```
 
-## 安全模型
-
-本项目**没有用户系统和角色权限**，但不是裸 API：
-
-1. 浏览器使用共享密码登录。
-2. 登录成功后 Worker 签发 `HttpOnly + Secure + SameSite=Strict` Session Cookie。
-3. 第三方 App / LLM 使用独立 Bearer API Key。
-4. 密码、Session Secret、API Key 全部使用 Cloudflare Worker Secrets，**禁止提交到 GitHub**。
-5. 密钥比较使用 `crypto.subtle.timingSafeEqual`。
-6. D1 查询全部使用 prepared statement。
-
-> 仓库是 public，因此实际共享密码不会写进代码、README 或 `.dev.vars.example`。部署时再把你指定的密码写入 Cloudflare Secret。
+可导出全部 JSON。
 
 ## 目录
 
 ```text
 OPK/
 ├── src/
-│   └── index.js
+│   ├── index.js          # 原有网页登录和核心 CRUD
+│   └── public-api.js     # 对 Agent 开放的零鉴权 API 入口
 ├── public/
 │   ├── index.html
 │   ├── app.js
 │   ├── style.css
 │   └── openapi.json
 ├── migrations/
-│   └── 0001_init.sql
 ├── .dev.vars.example
-├── .gitignore
 ├── package.json
 └── wrangler.jsonc
 ```
 
 ## 本地开发
 
-要求 Node.js 20+。
-
 ```bash
 npm install
 cp .dev.vars.example .dev.vars
 ```
 
-编辑 `.dev.vars`：
+`.dev.vars`：
 
 ```env
 DASHBOARD_PASSWORD=<your-password>
 SESSION_SECRET=<long-random-secret>
-API_KEY=<long-random-api-key>
 ```
 
-创建 D1：
-
-```bash
-npx wrangler d1 create opk-db
-```
-
-将返回的 `database_id` 写入 `wrangler.jsonc`，替换：
-
-```text
-REPLACE_WITH_D1_DATABASE_ID
-```
-
-应用本地 migration：
+然后创建/配置 D1、应用 migration：
 
 ```bash
 npm run db:migrate:local
-```
-
-启动：
-
-```bash
 npm run dev
 ```
 
 ## 生产部署
 
-**不要在错误的 Cloudflare 账号下执行以下步骤。** `fhkq.best` 所在 zone 必须属于当前正确授权的 Cloudflare 账号。
+GitHub Actions `deploy` 会自动：
 
-### 1. 创建 D1
-
-```bash
-npx wrangler d1 create opk-db
-```
-
-把返回的 `database_id` 写进 `wrangler.jsonc`。
-
-### 2. 应用远端 migration
-
-```bash
-npm run db:migrate:remote
-```
-
-### 3. 设置 Secrets
-
-```bash
-npx wrangler secret put DASHBOARD_PASSWORD
-npx wrangler secret put SESSION_SECRET
-npx wrangler secret put API_KEY
-```
-
-其中 `DASHBOARD_PASSWORD` 在正式部署时设为你指定的共享密码。
-
-建议随机生成另外两个值：
-
-```bash
-openssl rand -hex 32
-```
-
-### 4. Dry run
-
-```bash
-npm run check
-```
-
-### 5. 部署
-
-```bash
-npm run deploy
-```
-
-`wrangler.jsonc` 已预配置 `mes.fhkq.best` 作为 Worker Custom Domain。若该 hostname 已存在 CNAME，需要先处理冲突。
-
-## API 鉴权
-
-第三方 App / LLM：
-
-```http
-Authorization: Bearer YOUR_API_KEY
-```
-
-示例：
-
-```bash
-curl https://mes.fhkq.best/api/v1/projects \
-  -H "Authorization: Bearer $OPK_API_KEY"
-```
+1. 验证 Cloudflare 凭证；
+2. 查找/创建 `opk-db`；
+3. 应用 D1 migration；
+4. 上传网页登录所需两个 Secret；
+5. 部署 Worker + `mes.fhkq.best`；
+6. 检查 `/api/health`；
+7. **无鉴权检查 `/api/v1/projects` 和 `/api/v1/project-ids`。**
 
 ## API
 
 | Method | Path | 功能 |
 |---|---|---|
-| GET | `/api/health` | 健康检查，无需鉴权 |
-| POST | `/api/auth/login` | 浏览器密码登录 |
-| POST | `/api/auth/logout` | 浏览器退出 |
-| GET | `/api/auth/me` | 检查浏览器 Session |
+| GET | `/api/health` | 健康检查 |
+| POST | `/api/auth/login` | 网页密码登录 |
+| POST | `/api/auth/logout` | 网页退出 |
+| GET | `/api/auth/me` | 网页 Session 状态 |
 | GET | `/api/v1/dashboard` | 总览 |
+| POST | `/api/v1/project-ids` | 生成新的 project-id |
+| GET | `/api/v1/projects/similar?q=...` | 查同名/相似项目 |
 | GET / POST | `/api/v1/projects` | 项目查询 / 新建 |
 | GET / PATCH / DELETE | `/api/v1/projects/:id` | 项目详情 / 修改 / 删除 |
 | GET / POST | `/api/v1/projects/:id/milestones` | 项目节点查询 / 新建 |
@@ -208,10 +202,12 @@ curl https://mes.fhkq.best/api/v1/projects \
 | PATCH / DELETE | `/api/v1/issues/:id` | 问题修改 / 删除 |
 | GET | `/api/v1/export` | 全量 JSON 备份 |
 
-完整规范：`/openapi.json`
+完整规范：
+
+```text
+https://mes.fhkq.best/openapi.json
+```
 
 ## 当前边界
 
 故意不做：多用户、RBAC、团队/部门、评论流、文件附件、甘特图、通知中心、工时、财务。
-
-如果以后真出现刚需，再加；现在提前加这些只会把一个一人公司的推进工具做成维护负担。
