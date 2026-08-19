@@ -1,23 +1,11 @@
 {
-  "executed_at": "2026-08-19T16:51:04.436Z",
-  "batch_id": "opk-skill-zero-auth-v0.2-2026-08-20",
+  "executed_at": "2026-08-19T16:55:50.040Z",
+  "batch_id": "opk-skill-zero-auth-v0.2-final-2026-08-20",
   "ok": true,
   "results": [
     {
       "index": 0,
-      "request_id": "remove-migration-duplicate",
-      "method": "DELETE",
-      "path": "/api/v1/projects/5bf8037c-3a5e-4b31-9aa6-f853955c5b76",
-      "http_status": 200,
-      "ok": true,
-      "response": {
-        "ok": true,
-        "deleted": "5bf8037c-3a5e-4b31-9aa6-f853955c5b76"
-      }
-    },
-    {
-      "index": 1,
-      "request_id": "update-opk-skill-v02",
+      "request_id": "finalize-v02-project",
       "method": "PATCH",
       "path": "/api/v1/projects/fa9d64d3-8078-45b6-9262-a1beeae0c356",
       "http_status": 200,
@@ -32,81 +20,10 @@
           "priority": "high",
           "start_date": "2026-08-19",
           "due_date": null,
-          "next_action": "在 Codex、Claude、OpenCode 等不同 Agent 中分别加载 v0.2，验证：零鉴权读取、相似项目提示、新建 project-id、用户选择覆盖/新建、工作完成后自动回写与 read-back。",
-          "notes": "2026-08-20 v0.2：OPK API 已取消客户端 API_KEY；新增 POST /api/v1/project-ids 与 GET /api/v1/projects/similar；POST /api/v1/projects 支持传入 project_id/id。OPK-Skill 已同步更新 SKILL.md、AGENTS.md、README、API.md 和零依赖 Python CLI。首次提交遇到同名/相似项目必须停止并由用户决定新提交或覆盖；覆盖仅 PATCH 项目本体并保留里程碑/问题。生产 deploy 的 public_api 验证已通过。",
+          "next_action": "在 Codex、Claude、OpenCode 等不同 Agent 中加载 v0.2 做真实端到端验证：首次接入查重→用户选择新建/覆盖→读取项目上下文→执行任务→自动回写→read-back。",
+          "notes": "2026-08-20 v0.2 最终状态：生产 OPK /api/v1 已零鉴权；POST /api/v1/project-ids 和 GET /api/v1/projects/similar 已上线；旧 Worker API_KEY Secret 已物理删除并验证不存在；旧 authenticated one-shot sync workflows 已移除；OPK-Skill 的 SKILL.md/AGENTS.md/README/API.md/scripts/opk.py/install.sh/CI 已全部按零鉴权和用户决策查重流程更新。迁移时误建的重复 OPK Skill 项目已删除。",
           "created_at": "2026-08-19T02:05:09.313Z",
-          "updated_at": "2026-08-19T16:51:01.459Z",
-          "milestones": [
-            {
-              "id": "d30e36fc-df07-4c7e-a018-05063d54f574",
-              "project_id": "fa9d64d3-8078-45b6-9262-a1beeae0c356",
-              "title": "OPK Skill v1 仓库与核心闭环",
-              "status": "done",
-              "due_date": null,
-              "sort_order": 10,
-              "notes": "已完成 SKILL.md、AGENTS.md、纯 Python REST CLI、install.sh、项目映射模板与 CI；读→做→写→回读验证规则已固化。",
-              "created_at": "2026-08-19T02:06:15.188Z",
-              "updated_at": "2026-08-19T02:06:15.188Z"
-            },
-            {
-              "id": "de2d66d1-3140-4c63-84ab-87a893f64052",
-              "project_id": "fa9d64d3-8078-45b6-9262-a1beeae0c356",
-              "title": "跨 Agent 实机接入验证",
-              "status": "in_progress",
-              "due_date": null,
-              "sort_order": 20,
-              "notes": "下一阶段在 Codex、Claude 或其他可加载 Skill 的 Agent 中分别做一次真实读取与回写验证。",
-              "created_at": "2026-08-19T02:06:15.581Z",
-              "updated_at": "2026-08-19T02:06:15.581Z"
-            }
-          ],
-          "issues": []
-        }
-      }
-    },
-    {
-      "index": 2,
-      "request_id": "add-v02-milestone",
-      "method": "POST",
-      "path": "/api/v1/projects/fa9d64d3-8078-45b6-9262-a1beeae0c356/milestones",
-      "http_status": 201,
-      "ok": true,
-      "response": {
-        "ok": true,
-        "data": {
-          "id": "436b77c1-a70d-43b7-91e4-c6c3d680b26f",
-          "project_id": "fa9d64d3-8078-45b6-9262-a1beeae0c356",
-          "title": "v0.2 零鉴权 API + 首次接入查重",
-          "status": "done",
-          "due_date": null,
-          "sort_order": 15,
-          "notes": "已完成：客户端无需 API_KEY；API 可生成 project-id；相似项目 API；Skill 首次接入需要用户在新提交/覆盖之间明确决策；API 参考直接内置于 Skill。",
-          "created_at": "2026-08-19T16:51:03.235Z",
-          "updated_at": "2026-08-19T16:51:03.235Z"
-        }
-      }
-    },
-    {
-      "index": 3,
-      "request_id": "verify-opk-skill-v02",
-      "method": "GET",
-      "path": "/api/v1/projects/fa9d64d3-8078-45b6-9262-a1beeae0c356",
-      "http_status": 200,
-      "ok": true,
-      "response": {
-        "ok": true,
-        "data": {
-          "id": "fa9d64d3-8078-45b6-9262-a1beeae0c356",
-          "name": "OPK Skill",
-          "description": "跨 Agent 的 OPK 项目同步 Skill。OPK /api/v1 为零鉴权直接 REST；Agent 首次接入先查同名/相似项目，由用户决定新提交或覆盖；无候选时自动生成 project-id、创建项目、保存映射。工作前 READ，工作后 WRITE + VERIFY。GitHub: RuthlessCreature/OPK-Skill。",
-          "status": "active",
-          "priority": "high",
-          "start_date": "2026-08-19",
-          "due_date": null,
-          "next_action": "在 Codex、Claude、OpenCode 等不同 Agent 中分别加载 v0.2，验证：零鉴权读取、相似项目提示、新建 project-id、用户选择覆盖/新建、工作完成后自动回写与 read-back。",
-          "notes": "2026-08-20 v0.2：OPK API 已取消客户端 API_KEY；新增 POST /api/v1/project-ids 与 GET /api/v1/projects/similar；POST /api/v1/projects 支持传入 project_id/id。OPK-Skill 已同步更新 SKILL.md、AGENTS.md、README、API.md 和零依赖 Python CLI。首次提交遇到同名/相似项目必须停止并由用户决定新提交或覆盖；覆盖仅 PATCH 项目本体并保留里程碑/问题。生产 deploy 的 public_api 验证已通过。",
-          "created_at": "2026-08-19T02:05:09.313Z",
-          "updated_at": "2026-08-19T16:51:01.459Z",
+          "updated_at": "2026-08-19T16:55:48.001Z",
           "milestones": [
             {
               "id": "d30e36fc-df07-4c7e-a018-05063d54f574",
@@ -129,6 +46,88 @@
               "notes": "已完成：客户端无需 API_KEY；API 可生成 project-id；相似项目 API；Skill 首次接入需要用户在新提交/覆盖之间明确决策；API 参考直接内置于 Skill。",
               "created_at": "2026-08-19T16:51:03.235Z",
               "updated_at": "2026-08-19T16:51:03.235Z"
+            },
+            {
+              "id": "de2d66d1-3140-4c63-84ab-87a893f64052",
+              "project_id": "fa9d64d3-8078-45b6-9262-a1beeae0c356",
+              "title": "跨 Agent 实机接入验证",
+              "status": "in_progress",
+              "due_date": null,
+              "sort_order": 20,
+              "notes": "下一阶段在 Codex、Claude 或其他可加载 Skill 的 Agent 中分别做一次真实读取与回写验证。",
+              "created_at": "2026-08-19T02:06:15.581Z",
+              "updated_at": "2026-08-19T02:06:15.581Z"
+            }
+          ],
+          "issues": []
+        }
+      }
+    },
+    {
+      "index": 1,
+      "request_id": "finalize-v02-milestone",
+      "method": "PATCH",
+      "path": "/api/v1/milestones/436b77c1-a70d-43b7-91e4-c6c3d680b26f",
+      "http_status": 200,
+      "ok": true,
+      "response": {
+        "ok": true,
+        "data": {
+          "id": "436b77c1-a70d-43b7-91e4-c6c3d680b26f",
+          "project_id": "fa9d64d3-8078-45b6-9262-a1beeae0c356",
+          "title": "v0.2 零鉴权 API + 首次接入查重",
+          "status": "done",
+          "due_date": null,
+          "sort_order": 15,
+          "notes": "v0.2 已生产验证完成：无 API_KEY；新 project-id API；相似项目 API；首次提交有候选时强制用户决定新提交/覆盖；覆盖保留里程碑和问题；Skill 内置 API.md 和 OpenAPI 地址；Cloudflare 旧 API_KEY Secret 已删除。",
+          "created_at": "2026-08-19T16:51:03.235Z",
+          "updated_at": "2026-08-19T16:55:49.028Z"
+        }
+      }
+    },
+    {
+      "index": 2,
+      "request_id": "verify-v02-final",
+      "method": "GET",
+      "path": "/api/v1/projects/fa9d64d3-8078-45b6-9262-a1beeae0c356",
+      "http_status": 200,
+      "ok": true,
+      "response": {
+        "ok": true,
+        "data": {
+          "id": "fa9d64d3-8078-45b6-9262-a1beeae0c356",
+          "name": "OPK Skill",
+          "description": "跨 Agent 的 OPK 项目同步 Skill。OPK /api/v1 为零鉴权直接 REST；Agent 首次接入先查同名/相似项目，由用户决定新提交或覆盖；无候选时自动生成 project-id、创建项目、保存映射。工作前 READ，工作后 WRITE + VERIFY。GitHub: RuthlessCreature/OPK-Skill。",
+          "status": "active",
+          "priority": "high",
+          "start_date": "2026-08-19",
+          "due_date": null,
+          "next_action": "在 Codex、Claude、OpenCode 等不同 Agent 中加载 v0.2 做真实端到端验证：首次接入查重→用户选择新建/覆盖→读取项目上下文→执行任务→自动回写→read-back。",
+          "notes": "2026-08-20 v0.2 最终状态：生产 OPK /api/v1 已零鉴权；POST /api/v1/project-ids 和 GET /api/v1/projects/similar 已上线；旧 Worker API_KEY Secret 已物理删除并验证不存在；旧 authenticated one-shot sync workflows 已移除；OPK-Skill 的 SKILL.md/AGENTS.md/README/API.md/scripts/opk.py/install.sh/CI 已全部按零鉴权和用户决策查重流程更新。迁移时误建的重复 OPK Skill 项目已删除。",
+          "created_at": "2026-08-19T02:05:09.313Z",
+          "updated_at": "2026-08-19T16:55:48.001Z",
+          "milestones": [
+            {
+              "id": "d30e36fc-df07-4c7e-a018-05063d54f574",
+              "project_id": "fa9d64d3-8078-45b6-9262-a1beeae0c356",
+              "title": "OPK Skill v1 仓库与核心闭环",
+              "status": "done",
+              "due_date": null,
+              "sort_order": 10,
+              "notes": "已完成 SKILL.md、AGENTS.md、纯 Python REST CLI、install.sh、项目映射模板与 CI；读→做→写→回读验证规则已固化。",
+              "created_at": "2026-08-19T02:06:15.188Z",
+              "updated_at": "2026-08-19T02:06:15.188Z"
+            },
+            {
+              "id": "436b77c1-a70d-43b7-91e4-c6c3d680b26f",
+              "project_id": "fa9d64d3-8078-45b6-9262-a1beeae0c356",
+              "title": "v0.2 零鉴权 API + 首次接入查重",
+              "status": "done",
+              "due_date": null,
+              "sort_order": 15,
+              "notes": "v0.2 已生产验证完成：无 API_KEY；新 project-id API；相似项目 API；首次提交有候选时强制用户决定新提交/覆盖；覆盖保留里程碑和问题；Skill 内置 API.md 和 OpenAPI 地址；Cloudflare 旧 API_KEY Secret 已删除。",
+              "created_at": "2026-08-19T16:51:03.235Z",
+              "updated_at": "2026-08-19T16:55:49.028Z"
             },
             {
               "id": "de2d66d1-3140-4c63-84ab-87a893f64052",
