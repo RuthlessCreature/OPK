@@ -1,5 +1,14 @@
 {
-  "request_id": "metaalpha-close-verify-2026-08-19",
-  "method": "GET",
-  "path": "/api/v1/projects/03716d1e-e21f-460d-a19a-56faf51fc23c"
+  "request_id": "opk-skill-create-2026-08-19-1",
+  "method": "POST",
+  "path": "/api/v1/projects",
+  "body": {
+    "name": "OPK Skill",
+    "description": "跨 Agent 的 OPK 项目同步 Skill。Agent 在开始工作前读取 OPK 项目/里程碑/问题/下一步，完成工作后自动回写并 read-back 验证。GitHub: RuthlessCreature/OPK-Skill。",
+    "status": "active",
+    "priority": "high",
+    "start_date": "2026-08-19",
+    "next_action": "在 Codex/Claude/其他 Agent 中分别加载并做一次真实项目读写验证；根据兼容性反馈继续完善安装入口。",
+    "notes": "2026-08-19：已创建 public repo RuthlessCreature/OPK-Skill；已提供 SKILL.md、AGENTS.md、零依赖 Python CLI、.opk.json 映射模板、install.sh 和 CI 校验。Skill 强制执行 READ → WORK → WRITE → VERIFY 闭环。"
+  }
 }
