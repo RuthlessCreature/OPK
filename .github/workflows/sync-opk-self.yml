@@ -28,8 +28,8 @@ jobs:
       - name: Upsert OPK self project via production API
         run: |
           test -n "$API_KEY" || { echo "Missing API_KEY"; exit 10; }
-          node - <<'NODE'
-          const fs = require('fs');
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
           const BASE = 'https://mes.fhkq.best';
           const headers = {
             'authorization': `Bearer ${process.env.API_KEY}`,
