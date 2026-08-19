@@ -26,8 +26,8 @@ jobs:
       - name: Execute OPK API command
         run: |
           test -n "$API_KEY" || { echo "Missing API_KEY"; exit 10; }
-          node - <<'NODE'
-          const fs = require('fs');
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
           const BASE = 'https://mes.fhkq.best';
           const cmd = JSON.parse(fs.readFileSync('.opk-command.json', 'utf8'));
           const method = String(cmd.method || 'GET').toUpperCase();
