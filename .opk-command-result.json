@@ -1,24 +1,12 @@
 {
-  "executed_at": "2026-08-19T01:58:59.416Z",
-  "request_id": "metaalpha-close-issues-2026-08-19-1",
-  "method": "PATCH",
-  "path": "/api/v1/issues/b5a4cb0b-aa8f-4ccc-bee8-6e0d97ce7fb9",
+  "executed_at": "2026-08-19T01:59:24.952Z",
+  "request_id": "opk-skill-discovery-2026-08-19-1",
+  "method": "GET",
+  "path": "/api/v1/projects?q=OPK%20Skill",
   "http_status": 200,
   "ok": true,
   "response": {
     "ok": true,
-    "data": {
-      "id": "b5a4cb0b-aa8f-4ccc-bee8-6e0d97ce7fb9",
-      "project_id": "03716d1e-e21f-460d-a19a-56faf51fc23c",
-      "milestone_id": "139e8513-b104-43d4-88d3-e6f38baf81aa",
-      "title": "2026-08-17 eligible 预测尚未锁定 realized",
-      "description": "8/17 是 META_FWD_001 首个 confirmatory_eligible 预测。结算任务已执行，但当时 AKShare/Sina 仅返回到 2026-08-14，因此 append-only realized ledger 没有伪造或改用其他来源写入结果。",
-      "status": "closed",
-      "severity": "medium",
-      "next_action": "不再作为开放问题跟踪；8/17 realized 是否写入继续由 META_FWD_001 前瞻里程碑和 append-only ledger 状态自然反映。",
-      "notes": "2026-08-19 关闭：根因已从 provider latency/定时触发不可靠收敛为运维问题，并已新增显式 audited settlement trigger（settlement_only，不改 predictor/gate）。截至关闭时 8/17 realized 尚未出现在 ledger，因此此关闭仅表示运维问题已处理，不表示伪造或提前确认结算结果。",
-      "created_at": "2026-08-19T01:52:50.675Z",
-      "updated_at": "2026-08-19T01:58:58.808Z"
-    }
+    "data": []
   }
 }
