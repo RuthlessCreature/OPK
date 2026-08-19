@@ -1,6 +1,6 @@
 {
-  "executed_at": "2026-08-19T01:51:22.488Z",
-  "request_id": "metaalpha-sync-2026-08-19-ms1",
+  "executed_at": "2026-08-19T01:51:45.207Z",
+  "request_id": "metaalpha-sync-2026-08-19-ms2",
   "method": "POST",
   "path": "/api/v1/projects/03716d1e-e21f-460d-a19a-56faf51fc23c/milestones",
   "http_status": 201,
@@ -8,15 +8,15 @@
   "response": {
     "ok": true,
     "data": {
-      "id": "9dd2082a-d44c-4821-be4e-54e1ac186cd9",
+      "id": "99ca95a0-cf7b-4e0a-b718-072d2f893da6",
       "project_id": "03716d1e-e21f-460d-a19a-56faf51fc23c",
-      "title": "完成 v2 specificity-first 框架转向与历史 falsification",
-      "status": "done",
+      "title": "完成 2025-01-01 起精确逐日 expanding 重建",
+      "status": "in_progress",
       "due_date": null,
-      "sort_order": 10,
-      "notes": "已完成 rich Gregorian calendar stress、248 dense shifted-state null、100-seed hash negative-control ensemble、regime/router diagnostics，并形成 v2 specificity-first 决策：传统解释必须先证明真实映射比同复杂度 null 更特殊。",
-      "created_at": "2026-08-19T01:51:22.167Z",
-      "updated_at": "2026-08-19T01:51:22.167Z"
+      "sort_order": 20,
+      "notes": "固定C=0.01的关键三模型快线已完成：Baseline LL 0.691576；Ziping 0.690857（ΔLL +0.000719、ΔBrier +0.000365，低于冻结门槛）；Hash 0.688998（ΔLL +0.002578）。仍需完成每天重新 inner-CV 选C的精确六模型重建并归档结果。",
+      "created_at": "2026-08-19T01:51:45.005Z",
+      "updated_at": "2026-08-19T01:51:45.005Z"
     }
   }
 }
