@@ -1,7 +1,7 @@
 {
-  "recorded_at": "2026-08-19T16:45:13.312Z",
-  "run_id": "32277625916",
-  "source_sha": "ee274e37e75bfc8d4faaf5850bbe117b19c3a18b",
+  "recorded_at": "2026-08-19T16:55:03.105Z",
+  "run_id": "32278602312",
+  "source_sha": "5c005bf0aff8c393eec30a68dc081a9d38f4c48c",
   "job": "success",
   "steps": {
     "install": "success",
@@ -12,6 +12,7 @@
     "browser_login_secrets": "success",
     "prepare_secrets": "success",
     "deploy": "success",
+    "remove_legacy_api_key": "success",
     "health": "success",
     "public_api": "success"
   }
